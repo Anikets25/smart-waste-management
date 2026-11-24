@@ -1039,6 +1039,9 @@ def create_app():
 
     @app.route("/db-test")
     def db_test():
+        # Only available when FLASK_ENV=development — blocked in production
+        if os.environ.get("FLASK_ENV", "production") != "development":
+            abort(404)
         try:
             conn   = get_db_connection()
             cursor = conn.cursor()
@@ -1070,4 +1073,7 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(debug=True, host="127.0.0.1", port=5000)
+    # debug=True only when FLASK_ENV=development is set locally.
+    # On Railway / Render the env var will be absent, so debug is False.
+    debug_mode = os.environ.get("FLASK_ENV", "production") == "development"
+    app.run(debug=debug_mode, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
