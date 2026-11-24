@@ -1,0 +1,135 @@
+{% extends "staff/base.html" %}
+{% block title %}Task {{ complaint.complaint_id }} — Staff Portal{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div style="margin-bottom:1rem;">
+    <a href="{{ url_for('staff_dashboard') }}" class="btn btn-outline btn-sm">← My Tasks</a>
+  </div>
+
+  <div class="admin-header">
+    <div>
+      <h1>Task Detail</h1>
+      <p class="text-muted"><code>{{ complaint.complaint_id }}</code></p>
+    </div>
+    <span class="badge badge-{{ complaint.status|lower|replace(' ','') }}" style="font-size:1rem; padding:.4em 1em;">
+      {{ complaint.status }}
+    </span>
+  </div>
+
+  <div class="detail-layout">
+    <div class="detail-main">
+
+      <!-- Complaint info -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h3>Complaint Information</h3>
+        <div class="detail-grid" style="margin-top:1rem;">
+          <div class="detail-item"><span class="detail-label">Category</span><span class="detail-value">{{ complaint.category }}</span></div>
+          <div class="detail-item"><span class="detail-label">Submitted</span><span class="detail-value">{{ complaint.created_at|format_dt }}</span></div>
+          <div class="detail-item"><span class="detail-label">Last Updated</span><span class="detail-value">{{ complaint.updated_at|format_dt }}</span></div>
+        </div>
+        <div class="detail-description" style="margin-top:1rem;">
+          <span class="detail-label">Location</span><p>{{ complaint.location }}</p>
+        </div>
+        <div class="detail-description">
+          <span class="detail-label">Description</span><p>{{ complaint.description }}</p>
+        </div>
+      </div>
+
+      <!-- Update task -->
+      {% if complaint.status != 'Resolved' %}
+      <div class="card">
+        <h3>Update Task Status</h3>
+        <p class="text-muted" style="font-size:.9rem; margin-top:.4rem;">
+          Upload a photo of the area after cleaning to confirm resolution.
+        </p>
+        <form method="POST" action="{{ url_for('staff_update_task', cid=complaint.id) }}"
+              enctype="multipart/form-data" style="margin-top:1rem;">
+
+          <div class="form-group">
+            <label for="status_sel" class="required">New Status</label>
+            <select id="status_sel" name="status" class="form-control" required>
+              <option value="In Progress" {% if complaint.status=='In Progress' %}selected{% endif %}>In Progress</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>After-Cleaning Photo <span class="text-muted">(required when marking Resolved)</span></label>
+            <div class="file-upload-wrapper" id="dropZone">
+              <input type="file" id="after_image" name="after_image"
+                     accept="image/png,image/jpeg,image/gif,image/webp"/>
+              <div class="file-upload-icon">📷</div>
+              <p><strong>Click to upload</strong> or drag and drop</p>
+              <p class="text-muted" style="font-size:.85rem;">PNG, JPG, GIF, WEBP — max 5 MB</p>
+            </div>
+            <div class="file-upload-preview" id="imagePreview">
+              <img id="previewImg" src="#" alt="Preview"/>
+            </div>
+            <div id="fileError" class="text-danger" style="display:none; font-size:.875rem; margin-top:.4rem;"></div>
+          </div>
+
+          <button type="submit" class="btn btn-staff btn-lg btn-block">
+            💾 Update Task
+          </button>
+        </form>
+      </div>
+      {% else %}
+      <div class="card" style="background:var(--green-pale); border:1px solid var(--green-light); text-align:center; padding:1.5rem;">
+        <p style="font-size:1.5rem; margin:0;">✅</p>
+        <p style="font-weight:600; color:var(--green-dark); margin:.4rem 0 0;">This task is resolved.</p>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <div class="detail-sidebar">
+      <div class="card" style="margin-bottom:1rem;">
+        <h3>Complaint Photo</h3>
+        {% if complaint.image_path %}
+          <img src="{{ url_for('static', filename=complaint.image_path) }}" alt="Complaint photo"
+               class="complaint-image" style="cursor:pointer; margin-top:.75rem;"
+               onclick="openLightbox(this.src)"/>
+        {% else %}
+          <p class="text-muted" style="margin-top:.75rem;">No photo provided.</p>
+        {% endif %}
+      </div>
+      {% if complaint.after_image_path %}
+      <div class="card">
+        <h3>Your After-Photo</h3>
+        <img src="{{ url_for('static', filename=complaint.after_image_path) }}" alt="After cleaning"
+             class="complaint-image" style="cursor:pointer; margin-top:.75rem;"
+             onclick="openLightbox(this.src)"/>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<div id="lightbox" class="lightbox" onclick="closeLightbox()" style="display:none;">
+  <img id="lightboxImg" src="" alt="Full size"/>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const dz=document.getElementById("dropZone"), fi=document.getElementById("after_image"),
+      prev=document.getElementById("imagePreview"), pi=document.getElementById("previewImg"),
+      fe=document.getElementById("fileError");
+const MAX=5*1024*1024, TYPES=["image/png","image/jpeg","image/gif","image/webp"];
+dz?.addEventListener("click",()=>fi.click());
+dz?.addEventListener("dragover",e=>{e.preventDefault();dz.classList.add("dragover");});
+dz?.addEventListener("dragleave",()=>dz.classList.remove("dragover"));
+dz?.addEventListener("drop",e=>{e.preventDefault();dz.classList.remove("dragover");if(e.dataTransfer.files[0]){fi.files=e.dataTransfer.files;hf(e.dataTransfer.files[0]);}});
+fi?.addEventListener("change",()=>fi.files[0]&&hf(fi.files[0]));
+function hf(f){
+  fe.style.display="none"; prev.style.display="none";
+  if(!TYPES.includes(f.type)){fe.textContent="Invalid type.";fe.style.display="block";fi.value="";return;}
+  if(f.size>MAX){fe.textContent="Max 5 MB.";fe.style.display="block";fi.value="";return;}
+  const r=new FileReader();r.onload=e=>{pi.src=e.target.result;prev.style.display="block";};r.readAsDataURL(f);
+}
+function openLightbox(src){document.getElementById("lightboxImg").src=src;document.getElementById("lightbox").style.display="flex";document.body.style.overflow="hidden";}
+function closeLightbox(){document.getElementById("lightbox").style.display="none";document.body.style.overflow="";}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLightbox();});
+</script>
+{% endblock %}

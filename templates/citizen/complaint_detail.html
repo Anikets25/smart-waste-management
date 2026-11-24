@@ -1,0 +1,75 @@
+{% extends "citizen/base.html" %}
+{% block title %}{{ complaint.complaint_id }} — Citizen Portal{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div style="margin-bottom:1rem;">
+    <a href="{{ url_for('citizen_my_complaints') }}" class="btn btn-outline btn-sm">← My Complaints</a>
+  </div>
+
+  <div class="complaint-result">
+    <div class="result-header">
+      <div>
+        <h2>Complaint Detail</h2>
+        <p class="complaint-id-display">{{ complaint.complaint_id }}</p>
+      </div>
+      <span class="badge badge-{{ complaint.status|lower|replace(' ','') }}">{{ complaint.status }}</span>
+    </div>
+
+    {% set steps = ['Submitted','Under Review','In Progress','Resolved'] %}
+    {% set smap  = {'Submitted':0,'Under Review':1,'In Progress':2,'Resolved':3} %}
+    {% set cur   = smap.get(complaint.status, 0) %}
+    <div class="status-timeline">
+      {% for step in steps %}
+        {% set i = loop.index0 %}
+        <div class="timeline-step {% if i < cur %}done{% elif i == cur %}active{% endif %}">
+          <div class="step-dot">{% if i < cur %}✓{% else %}{{ loop.index }}{% endif %}</div>
+          <div class="step-label">{{ step }}</div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-item"><span class="detail-label">Category</span><span class="detail-value">{{ complaint.category }}</span></div>
+      <div class="detail-item"><span class="detail-label">Location</span><span class="detail-value">{{ complaint.location }}</span></div>
+      <div class="detail-item"><span class="detail-label">Submitted</span><span class="detail-value">{{ complaint.created_at|format_dt }}</span></div>
+      <div class="detail-item"><span class="detail-label">Last Updated</span><span class="detail-value">{{ complaint.updated_at|format_dt }}</span></div>
+      {% if complaint.green_points_awarded > 0 %}
+      <div class="detail-item"><span class="detail-label">Green Points Earned</span><span class="detail-value" style="color:var(--green-main); font-weight:700;">+{{ complaint.green_points_awarded }} 🌿</span></div>
+      {% endif %}
+    </div>
+
+    <div class="detail-description">
+      <span class="detail-label">Description</span>
+      <p>{{ complaint.description }}</p>
+    </div>
+
+    {% if complaint.image_path %}
+    <div class="complaint-image-box">
+      <span class="detail-label">Your Photo</span>
+      <img src="{{ url_for('static', filename=complaint.image_path) }}" alt="Complaint photo"
+           class="complaint-image" onclick="openLightbox(this.src)"/>
+    </div>
+    {% endif %}
+
+    {% if complaint.after_image_path %}
+    <div class="complaint-image-box" style="margin-top:1rem;">
+      <span class="detail-label">After-Cleaning Photo (uploaded by staff)</span>
+      <img src="{{ url_for('static', filename=complaint.after_image_path) }}" alt="After cleaning"
+           class="complaint-image" onclick="openLightbox(this.src)"/>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<div id="lightbox" class="lightbox" onclick="closeLightbox()" style="display:none;">
+  <img id="lightboxImg" src="" alt="Full size"/>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function openLightbox(src) { document.getElementById("lightboxImg").src=src; document.getElementById("lightbox").style.display="flex"; document.body.style.overflow="hidden"; }
+function closeLightbox() { document.getElementById("lightbox").style.display="none"; document.body.style.overflow=""; }
+document.addEventListener("keydown", e => { if(e.key==="Escape") closeLightbox(); });
+</script>
+{% endblock %}

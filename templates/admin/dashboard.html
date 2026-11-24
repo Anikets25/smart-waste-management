@@ -1,0 +1,75 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard — Admin{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="admin-header">
+    <div>
+      <h1>📊 Admin Dashboard</h1>
+      <p class="text-muted">Welcome back, <strong>{{ session.admin_username }}</strong></p>
+    </div>
+    <div style="display:flex; gap:.5rem;">
+      <a href="{{ url_for('admin_add_staff') }}" class="btn btn-admin btn-sm">+ Add Staff</a>
+      <a href="{{ url_for('admin_logout') }}" class="btn btn-outline btn-sm">Logout</a>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-cards">
+    <div class="stat-card"><span class="stat-number">{{ stats.total }}</span><span class="stat-label">Total Complaints</span></div>
+    <div class="stat-card submitted"><span class="stat-number">{{ stats.submitted }}</span><span class="stat-label">Submitted</span></div>
+    <div class="stat-card review"><span class="stat-number">{{ stats.under_review }}</span><span class="stat-label">Under Review</span></div>
+    <div class="stat-card inprogress"><span class="stat-number">{{ stats.in_progress }}</span><span class="stat-label">In Progress</span></div>
+    <div class="stat-card resolved"><span class="stat-number">{{ stats.resolved }}</span><span class="stat-label">Resolved</span></div>
+    <div class="stat-card" style="border-left-color:#0288d1;"><span class="stat-number">{{ stats.citizens }}</span><span class="stat-label">Citizens</span></div>
+    <div class="stat-card" style="border-left-color:#6a1b9a;"><span class="stat-number">{{ stats.staff }}</span><span class="stat-label">Staff Members</span></div>
+  </div>
+
+  <!-- Category breakdown -->
+  <div class="card" style="margin-top:2rem;">
+    <h3>Complaints by Category</h3>
+    <div class="category-stats" style="margin-top:1rem;">
+      {% for cat in category_stats %}
+      <div class="cat-stat-row">
+        <span class="cat-name">{{ cat.category }}</span>
+        <div class="cat-bar-wrap">
+          <div class="cat-bar" style="width:{% if stats.total > 0 %}{{ ((cat.count / stats.total)*100)|round(1) }}{% else %}0{% endif %}%;"></div>
+        </div>
+        <span class="cat-count">{{ cat.count }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Recent complaints -->
+  <div class="card" style="margin-top:2rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <h3>Recent Complaints</h3>
+      <a href="{{ url_for('admin_complaints') }}" class="btn btn-outline btn-sm">View All →</a>
+    </div>
+    {% if recent %}
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Complaint ID</th><th>Citizen</th><th>Category</th><th>Status</th><th>Date</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for c in recent %}
+          <tr>
+            <td><code>{{ c.complaint_id }}</code></td>
+            <td>{{ c.citizen_name or '(anonymous)' }}</td>
+            <td>{{ c.category }}</td>
+            <td><span class="badge badge-{{ c.status|lower|replace(' ','') }}">{{ c.status }}</span></td>
+            <td class="text-muted" style="font-size:.85rem;">{{ c.created_at|format_dt }}</td>
+            <td><a href="{{ url_for('admin_complaint_detail', cid=c.id) }}" class="btn btn-outline btn-sm">View</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="text-muted">No complaints yet.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

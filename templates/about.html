@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}About — Smart Waste Management System{% endblock %}
+
+{% block content %}
+
+<section class="section">
+  <div class="page-header">
+    <h1>ℹ️ About This Project</h1>
+    <p class="text-muted">Smart Waste Management System — B.Tech Final Year Project</p>
+  </div>
+
+  <div class="about-grid">
+
+    <div class="about-main">
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h2>🎯 Project Goal</h2>
+        <p style="margin-top:.75rem;">
+          The Smart Waste Management System is a web-based platform that lets citizens report
+          waste and garbage problems in their local area. The goal is to create a simple,
+          transparent link between the public and waste management administrators, so reported
+          problems are tracked and resolved — not forgotten.
+        </p>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h2>⚙️ How It Works</h2>
+        <div class="how-steps">
+          <div class="how-step">
+            <span class="how-num">1</span>
+            <div>
+              <strong>Citizen Reports a Problem</strong>
+              <p>Fill in a form with a description, waste category, location, and optional photo. Receive a unique complaint ID.</p>
+            </div>
+          </div>
+          <div class="how-step">
+            <span class="how-num">2</span>
+            <div>
+              <strong>Admin Reviews the Complaint</strong>
+              <p>An administrator logs into the secure admin panel, views all submitted complaints, and updates their status.</p>
+            </div>
+          </div>
+          <div class="how-step">
+            <span class="how-num">3</span>
+            <div>
+              <strong>Citizen Tracks the Status</strong>
+              <p>Using the complaint ID, the citizen can check the current status at any time: Submitted → Under Review → In Progress → Resolved.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🛠️ Technology Stack</h2>
+        <div class="tech-grid">
+          <div class="tech-item"><span class="tech-icon">🌐</span><span><strong>Frontend</strong><br>HTML5, CSS3, Vanilla JavaScript</span></div>
+          <div class="tech-item"><span class="tech-icon">🐍</span><span><strong>Backend</strong><br>Python, Flask</span></div>
+          <div class="tech-item"><span class="tech-icon">🗄️</span><span><strong>Database</strong><br>MySQL</span></div>
+          <div class="tech-item"><span class="tech-icon">📁</span><span><strong>File Storage</strong><br>Local (static/uploads)</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="about-sidebar">
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h3>👩‍💻 Team</h3>
+        <div class="team-list">
+          <div class="team-member">
+            <span class="team-avatar">🧑‍💻</span>
+            <span>Aniket</span>
+          </div>
+          <div class="team-member">
+            <span class="team-avatar">👩‍💻</span>
+            <span>Pratigya</span>
+          </div>
+          <div class="team-member">
+            <span class="team-avatar">🧑‍💻</span>
+            <span>Arul</span>
+          </div>
+        </div>
+        <p class="text-muted" style="font-size:.875rem; margin-top:.75rem;">B.Tech Final Year Project</p>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h3>🗂️ Waste Categories</h3>
+        <ul style="line-height:2;">
+          <li>🧴 Plastic Waste</li>
+          <li>🗑️ Wet Waste</li>
+          <li>📦 Dry Waste</li>
+          <li>♻️ Other</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>📊 Complaint Statuses</h3>
+        <div style="display:flex; flex-direction:column; gap:.6rem; margin-top:.5rem;">
+          <span class="badge badge-submitted"   style="align-self:flex-start;">Submitted</span>
+          <span class="badge badge-underreview" style="align-self:flex-start;">Under Review</span>
+          <span class="badge badge-inprogress"  style="align-self:flex-start;">In Progress</span>
+          <span class="badge badge-resolved"    style="align-self:flex-start;">Resolved</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

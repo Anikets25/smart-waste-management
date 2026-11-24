@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login — Smart Waste Management</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body class="auth-body auth-admin">
+
+  <div class="auth-wrapper">
+    <div class="auth-brand">
+      <a href="{{ url_for('landing') }}" class="auth-back">← Back to portal home</a>
+      <div class="auth-logo">🏛️</div>
+      <h1>Admin Portal</h1>
+      <p>Municipal waste management control panel.</p>
+    </div>
+
+    <div class="auth-card">
+      <h2>Administrator Login</h2>
+      <p class="text-muted" style="margin-bottom:1.5rem; font-size:.9rem;">
+        Restricted area — authorised personnel only.
+      </p>
+
+      {% if error %}
+        <div class="flash flash-error" style="margin-bottom:1rem;">{{ error }}</div>
+      {% endif %}
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}
+          <div class="flash flash-{{ cat }}" style="margin-bottom:.75rem;">{{ msg }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('admin_login') }}" novalidate>
+        <div class="form-group">
+          <label for="username" class="required">Username</label>
+          <input type="text" id="username" name="username" class="form-control"
+                 placeholder="Admin username" autocomplete="username" required
+                 value="{{ username or '' }}"/>
+        </div>
+        <div class="form-group">
+          <label for="password" class="required">Password</label>
+          <div style="position:relative;">
+            <input type="password" id="password" name="password" class="form-control"
+                   placeholder="Password" autocomplete="current-password"
+                   required style="padding-right:3rem;"/>
+            <button type="button" class="pwd-toggle" onclick="togglePwd('password')">👁</button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-admin btn-block btn-lg" style="margin-top:.5rem;">
+          Login →
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>function togglePwd(id){ const f=document.getElementById(id); f.type=f.type==="password"?"text":"password"; }</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Smart Waste Management System{% endblock %}</title>
+
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+  <!-- Favicon (simple emoji fallback — replace with a real .ico in production) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♻️</text></svg>" />
+
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+  <!-- ── Navigation ──────────────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="nav-container">
+
+      <!-- Brand / Logo -->
+      <a href="{{ url_for('index') }}" class="nav-brand">
+        <span class="brand-icon">♻️</span>
+        <span class="brand-text">SmartWaste</span>
+      </a>
+
+      <!-- Hamburger button (shown on mobile) -->
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- Navigation links -->
+      <ul class="nav-links" id="navLinks">
+        <li><a href="{{ url_for('landing') }}"  class="nav-link {% if request.endpoint == 'landing'  %}active{% endif %}">Home</a></li>
+        <li><a href="/report"                   class="nav-link {% if request.endpoint == 'report'  %}active{% endif %}">Report Waste</a></li>
+        <li><a href="/track"                    class="nav-link {% if request.endpoint == 'track'   %}active{% endif %}">Track Complaint</a></li>
+        <li><a href="/about"                    class="nav-link {% if request.endpoint == 'about'   %}active{% endif %}">About</a></li>
+        <li><a href="{{ url_for('landing') }}"  class="nav-link nav-link-admin">Portals</a></li>
+      </ul>
+
+    </div>
+  </nav>
+
+  <!-- ── Flash messages ──────────────────────────────────────────────── -->
+  {# Flask's flash() system sends one-time messages (errors, success notices). #}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">
+            <span>{{ message }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- ── Main content ────────────────────────────────────────────────── -->
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-section">
+        <h4>♻️ SmartWaste</h4>
+        <p>Report waste. Track progress.<br>Keep your area clean.</p>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="{{ url_for('landing') }}">Home</a></li>
+          <li><a href="/report">Report Waste</a></li>
+          <li><a href="/track">Track Complaint</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Project</h4>
+        <p>B.Tech Final Year Project<br>
+           Team: Aniket, Pratigya &amp; Arul<br>
+           Smart Waste Management System</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 Smart Waste Management System. Academic Project.</p>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript -->
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  {% block scripts %}{% endblock %}
+
+</body>
+</html>

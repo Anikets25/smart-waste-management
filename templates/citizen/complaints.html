@@ -1,0 +1,58 @@
+{% extends "citizen/base.html" %}
+{% block title %}My Complaints — Citizen Portal{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="page-header">
+    <h1>📋 My Complaints</h1>
+    <p class="text-muted">All waste reports you have submitted.</p>
+  </div>
+
+  {% if complaints %}
+  <div class="card">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Complaint ID</th>
+            <th>Category</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Points</th>
+            <th>Date</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in complaints %}
+          <tr>
+            <td class="text-muted" style="font-size:.85rem;">{{ loop.index }}</td>
+            <td><code>{{ c.complaint_id }}</code></td>
+            <td>{{ c.category }}</td>
+            <td class="truncate">{{ c.location }}</td>
+            <td><span class="badge badge-{{ c.status|lower|replace(' ','') }}">{{ c.status }}</span></td>
+            <td>
+              {% if c.green_points_awarded > 0 %}
+                <span style="color:var(--green-main); font-weight:600;">+{{ c.green_points_awarded }} 🌿</span>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td class="text-muted" style="font-size:.85rem;">{{ c.created_at|format_dt }}</td>
+            <td><a href="{{ url_for('citizen_complaint_detail', complaint_id_str=c.complaint_id) }}" class="btn btn-outline btn-sm">View</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="card" style="text-align:center; padding:3rem 1rem;">
+    <p style="font-size:2.5rem;">🗑️</p>
+    <p class="text-muted">You haven't submitted any complaints yet.</p>
+    <a href="{{ url_for('citizen_report') }}" class="btn btn-citizen" style="margin-top:.75rem;">Report Waste Now</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

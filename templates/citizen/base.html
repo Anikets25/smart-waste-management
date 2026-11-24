@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Citizen Portal — Smart Waste{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♻️</text></svg>"/>
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Citizen navbar — green, eco-focused -->
+  <nav class="navbar navbar-citizen">
+    <div class="nav-container">
+      <a href="{{ url_for('citizen_dashboard') }}" class="nav-brand">
+        <span class="brand-icon">♻️</span>
+        <span class="brand-text">SmartWaste <span class="portal-tag">Citizen</span></span>
+      </a>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="{{ url_for('citizen_dashboard') }}"     class="nav-link {% if request.endpoint=='citizen_dashboard' %}active{% endif %}">🏠 Dashboard</a></li>
+        <li><a href="{{ url_for('citizen_report') }}"        class="nav-link {% if request.endpoint=='citizen_report' %}active{% endif %}">🗑️ Report</a></li>
+        <li><a href="{{ url_for('citizen_my_complaints') }}" class="nav-link {% if request.endpoint=='citizen_my_complaints' %}active{% endif %}">📋 My Complaints</a></li>
+        <li><a href="{{ url_for('citizen_rewards') }}"       class="nav-link {% if request.endpoint=='citizen_rewards' %}active{% endif %}">🌿 Rewards</a></li>
+        <li><a href="{{ url_for('citizen_profile') }}"       class="nav-link {% if request.endpoint=='citizen_profile' %}active{% endif %}">👤 Profile</a></li>
+        <li>
+          <a href="{{ url_for('citizen_logout') }}" class="nav-link nav-link-logout">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for cat, msg in messages %}
+          <div class="flash flash-{{ cat }}">
+            <span>{{ msg }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-section">
+        <h4>♻️ SmartWaste Citizen</h4>
+        <p>Report Waste. Earn Points.<br>Keep Your Area Clean.</p>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="{{ url_for('citizen_dashboard') }}">Dashboard</a></li>
+          <li><a href="{{ url_for('citizen_report') }}">Report Waste</a></li>
+          <li><a href="{{ url_for('citizen_rewards') }}">Rewards</a></li>
+          <li><a href="{{ url_for('track') }}">Track Complaint</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Portals</h4>
+        <ul>
+          <li><a href="{{ url_for('landing') }}">Portal Home</a></li>
+          <li><a href="{{ url_for('admin_login') }}">Admin Login</a></li>
+          <li><a href="{{ url_for('staff_login') }}">Staff Login</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 Smart Waste Management System — B.Tech Final Year Project</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Complaint Submitted — Smart Waste Management System{% endblock %}
+
+{% block content %}
+
+<section class="section" style="max-width:640px; margin:0 auto;">
+
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h1>Complaint Submitted!</h1>
+    <p class="text-muted">Thank you for reporting. We will review your complaint and take action.</p>
+
+    <div class="complaint-id-box">
+      <span class="detail-label">Your Complaint ID</span>
+      <div class="complaint-id-big">{{ complaint_id }}</div>
+      <button class="btn btn-outline btn-sm" onclick="copyId()">📋 Copy ID</button>
+      <small class="text-muted" id="copiedMsg" style="display:none; margin-left:.5rem;">Copied!</small>
+    </div>
+
+    <div class="detail-grid" style="margin-top:1.5rem;">
+      <div class="detail-item">
+        <span class="detail-label">Status</span>
+        <span class="badge badge-submitted">Submitted</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Submitted At</span>
+        <span class="detail-value">{{ submitted_at }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Category</span>
+        <span class="detail-value">{{ category }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Location</span>
+        <span class="detail-value">{{ location }}</span>
+      </div>
+    </div>
+
+    <div class="success-actions">
+      <a href="/track?id={{ complaint_id }}" class="btn btn-primary">🔍 Track This Complaint</a>
+      <a href="/report" class="btn btn-outline">Report Another</a>
+    </div>
+
+    <p class="text-muted" style="font-size:.875rem; margin-top:1.5rem;">
+      Save your complaint ID — you will need it to track your complaint status.
+    </p>
+  </div>
+
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyId() {
+  const id = "{{ complaint_id }}";
+  navigator.clipboard.writeText(id).then(function () {
+    const msg = document.getElementById("copiedMsg");
+    msg.style.display = "inline";
+    setTimeout(function () { msg.style.display = "none"; }, 2000);
+  });
+}
+</script>
+{% endblock %}

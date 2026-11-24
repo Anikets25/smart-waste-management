@@ -1,0 +1,53 @@
+{% extends "admin/base.html" %}
+{% block title %}Add Staff — Admin{% endblock %}
+
+{% block content %}
+<section class="section" style="max-width:580px;">
+  <div class="page-header">
+    <h1>👷 Add Staff Member</h1>
+    <p class="text-muted">Staff accounts are created by administrators only.</p>
+  </div>
+
+  <div class="form-card" style="margin-top:0;">
+    <form method="POST" action="{{ url_for('admin_add_staff') }}" novalidate>
+      <div class="form-group">
+        <label for="name" class="required">Full Name</label>
+        <input type="text" id="name" name="name" class="form-control"
+               required maxlength="120" value="{{ form.name or '' }}"/>
+      </div>
+      <div class="form-group">
+        <label for="email" class="required">Email Address</label>
+        <input type="email" id="email" name="email" class="form-control"
+               required maxlength="180" value="{{ form.email or '' }}"/>
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone" class="form-control"
+               maxlength="20" value="{{ form.phone or '' }}"/>
+      </div>
+      <div class="form-group">
+        <label for="zone">Zone / Area</label>
+        <input type="text" id="zone" name="zone" class="form-control"
+               placeholder="e.g. North Zone, Sector 12" maxlength="100"
+               value="{{ form.zone or '' }}"/>
+      </div>
+      <div class="form-group">
+        <label for="password" class="required">Initial Password</label>
+        <div style="position:relative;">
+          <input type="password" id="password" name="password" class="form-control"
+                 placeholder="Minimum 8 characters" required style="padding-right:3rem;"/>
+          <button type="button" class="pwd-toggle" onclick="togglePwd('password')">👁</button>
+        </div>
+        <small class="text-muted">Staff member should change this on first login.</small>
+      </div>
+      <div style="display:flex; gap:.75rem; margin-top:1rem;">
+        <button type="submit" class="btn btn-admin">Create Staff Account</button>
+        <a href="{{ url_for('admin_staff_list') }}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>function togglePwd(id){ const f=document.getElementById(id); f.type=f.type==="password"?"text":"password"; }</script>
+{% endblock %}

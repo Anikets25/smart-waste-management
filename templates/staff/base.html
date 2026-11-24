@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Staff Portal — Smart Waste{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+  <nav class="navbar navbar-staff">
+    <div class="nav-container">
+      <a href="{{ url_for('staff_dashboard') }}" class="nav-brand">
+        <span class="brand-icon">🚛</span>
+        <span class="brand-text">SmartWaste <span class="portal-tag">Staff</span></span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="{{ url_for('staff_dashboard') }}" class="nav-link {% if request.endpoint=='staff_dashboard' %}active{% endif %}">📋 My Tasks</a></li>
+        <li>
+          <span class="nav-link" style="color:rgba(255,255,255,.6); cursor:default;">
+            {{ session.staff_name }} ({{ session.staff_emp }})
+          </span>
+        </li>
+        <li><a href="{{ url_for('staff_logout') }}" class="nav-link nav-link-logout">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for cat, msg in messages %}
+          <div class="flash flash-{{ cat }}">
+            <span>{{ msg }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main class="main-content">{% block content %}{% endblock %}</main>
+
+  <footer class="footer footer-staff">
+    <div class="footer-bottom">
+      <p>© 2024 Smart Waste Management System — Staff Portal</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

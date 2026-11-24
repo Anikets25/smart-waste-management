@@ -1,0 +1,53 @@
+{% extends "staff/base.html" %}
+{% block title %}My Tasks — Staff Portal{% endblock %}
+
+{% block content %}
+<section class="section">
+
+  <div class="admin-header">
+    <div>
+      <h1>📋 My Assigned Tasks</h1>
+      <p class="text-muted">{{ session.staff_name }} · {{ session.staff_emp }}</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-cards" style="margin-bottom:1.5rem;">
+    <div class="stat-card"><span class="stat-number">{{ stats.total }}</span><span class="stat-label">Total Tasks</span></div>
+    <div class="stat-card review"><span class="stat-number">{{ stats.pending }}</span><span class="stat-label">Pending</span></div>
+    <div class="stat-card inprogress"><span class="stat-number">{{ stats.in_progress }}</span><span class="stat-label">In Progress</span></div>
+    <div class="stat-card resolved"><span class="stat-number">{{ stats.resolved }}</span><span class="stat-label">Resolved</span></div>
+  </div>
+
+  <!-- Task list -->
+  {% if tasks %}
+  <div class="staff-task-list">
+    {% for t in tasks %}
+    <a href="{{ url_for('staff_task_detail', cid=t.id) }}" class="staff-task-card {% if t.status=='Resolved' %}task-done{% elif t.status=='In Progress' %}task-active{% endif %}">
+      <div class="task-left">
+        <span class="task-cat-icon">
+          {% if t.category=='Plastic' %}🧴{% elif t.category=='Wet Waste' %}🗑️{% elif t.category=='Dry Waste' %}📦{% else %}♻️{% endif %}
+        </span>
+        <div>
+          <div class="task-id"><code>{{ t.complaint_id }}</code></div>
+          <div class="task-location">📍 {{ t.location }}</div>
+          <div class="task-meta text-muted" style="font-size:.8rem;">{{ t.category }} · {{ t.created_at|format_dt }}</div>
+        </div>
+      </div>
+      <div class="task-right">
+        <span class="badge badge-{{ t.status|lower|replace(' ','') }}">{{ t.status }}</span>
+        <span class="task-arrow">›</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card" style="text-align:center; padding:3rem;">
+    <p style="font-size:2.5rem;">✅</p>
+    <p class="text-muted">No tasks assigned to you yet.</p>
+    <p class="text-muted" style="font-size:.9rem;">Contact your administrator if this seems wrong.</p>
+  </div>
+  {% endif %}
+
+</section>
+{% endblock %}

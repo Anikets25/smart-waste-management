@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Waste Management System — Portal Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♻️</text></svg>"/>
+</head>
+<body class="landing-body">
+
+  <!-- Flash messages (shown when redirected back with a message) -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container" style="top:1rem;">
+        {% for cat, msg in messages %}
+          <div class="flash flash-{{ cat }}">
+            <span>{{ msg }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="landing-wrapper">
+
+    <!-- Header -->
+    <div class="landing-header">
+      <div class="landing-logo">♻️</div>
+      <h1 class="landing-title">Smart Waste Management</h1>
+      <p class="landing-subtitle">Report waste. Track progress. Keep your area clean.</p>
+    </div>
+
+    <!-- Portal cards -->
+    <div class="portal-grid">
+
+      <!-- Citizen -->
+      <div class="portal-card portal-citizen">
+        <div class="portal-icon">👤</div>
+        <h2>Citizen Portal</h2>
+        <p>Report waste issues, track your complaints, earn Green Points, and redeem rewards.</p>
+        <ul class="portal-features">
+          <li>✅ Report garbage issues</li>
+          <li>✅ Track complaint status</li>
+          <li>✅ Green Points wallet</li>
+          <li>✅ Rewards marketplace</li>
+        </ul>
+        <div class="portal-actions">
+          <a href="/citizen/login"    class="btn btn-citizen">Login</a>
+          <a href="/citizen/register" class="btn btn-citizen-outline">Register Free</a>
+        </div>
+      </div>
+
+      <!-- Admin -->
+      <div class="portal-card portal-admin">
+        <div class="portal-icon">🏛️</div>
+        <h2>Admin Portal</h2>
+        <p>Manage complaints, oversee collection teams, review analytics, and handle rewards.</p>
+        <ul class="portal-features">
+          <li>✅ Full complaint management</li>
+          <li>✅ Staff assignment</li>
+          <li>✅ Green Points management</li>
+          <li>✅ Reports & analytics</li>
+        </ul>
+        <div class="portal-actions">
+          <a href="/admin/login" class="btn btn-admin">Admin Login</a>
+        </div>
+        <p class="portal-note">Admin accounts are created by administrators only.</p>
+      </div>
+
+      <!-- Staff -->
+      <div class="portal-card portal-staff">
+        <div class="portal-icon">🚛</div>
+        <h2>Collection Staff</h2>
+        <p>View assigned collection tasks, update status, and upload after-cleaning photos.</p>
+        <ul class="portal-features">
+          <li>✅ View assigned tasks</li>
+          <li>✅ Update task status</li>
+          <li>✅ Upload after-photos</li>
+          <li>✅ Completed task history</li>
+        </ul>
+        <div class="portal-actions">
+          <a href="/staff/login" class="btn btn-staff">Staff Login</a>
+        </div>
+        <p class="portal-note">Staff accounts are created by administrators.</p>
+      </div>
+
+    </div>
+
+    <!-- Quick track bar -->
+    <div class="landing-track-bar">
+      <span>Already have a complaint ID?</span>
+      <form action="/track" method="GET" class="landing-track-form">
+        <input type="text" name="id" class="form-control" placeholder="WMS-20241115-A3F9K2" maxlength="30"/>
+        <button type="submit" class="btn btn-primary btn-sm">Track →</button>
+      </form>
+    </div>
+
+    <footer class="landing-footer">
+      <p>© 2024 Smart Waste Management System — B.Tech Final Year Project</p>
+      <p>Team: Aniket, Pratigya &amp; Arul</p>
+    </footer>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

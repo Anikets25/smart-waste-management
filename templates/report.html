@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% block title %}Report Waste — Smart Waste Management System{% endblock %}
+
+{% block content %}
+
+<section class="section">
+  <div class="page-header">
+    <h1>🗑️ Report a Waste Problem</h1>
+    <p class="text-muted">Fill in the details below. All fields marked * are required.</p>
+  </div>
+
+  <div class="form-card">
+    <form id="reportForm" action="/report" method="POST" enctype="multipart/form-data" novalidate>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description" class="required">Describe the Problem</label>
+        <textarea
+          id="description"
+          name="description"
+          class="form-control"
+          rows="4"
+          placeholder="E.g. Large pile of plastic bags and garbage near the main gate..."
+          maxlength="1000"
+          required
+        >{{ form_data.description if form_data }}</textarea>
+        <div class="invalid-feedback">Please describe the waste problem (minimum 10 characters).</div>
+        <small class="char-counter text-muted"><span id="descCount">0</span>/1000</small>
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label for="category" class="required">Waste Category</label>
+        <select id="category" name="category" class="form-control" required>
+          <option value="" disabled {% if not form_data %}selected{% endif %}>-- Select a category --</option>
+          {% for cat in ['Plastic', 'Wet Waste', 'Dry Waste', 'Other'] %}
+            <option value="{{ cat }}" {% if form_data and form_data.category == cat %}selected{% endif %}>
+              {{ cat }}
+            </option>
+          {% endfor %}
+        </select>
+        <div class="invalid-feedback">Please select a waste category.</div>
+      </div>
+
+      <!-- Location -->
+      <div class="form-group">
+        <label for="location" class="required">Location / Address</label>
+        <input
+          type="text"
+          id="location"
+          name="location"
+          class="form-control"
+          placeholder="E.g. Near Gate No. 3, Gandhi Road, Sector 12, Delhi"
+          maxlength="255"
+          required
+          value="{{ form_data.location if form_data }}"
+        />
+        <div class="invalid-feedback">Please enter the location of the waste.</div>
+      </div>
+
+      <!-- Image upload -->
+      <div class="form-group">
+        <label for="image">Upload a Photo <span class="text-muted">(optional, max 5 MB)</span></label>
+        <div class="file-upload-wrapper" id="dropZone">
+          <input
+            type="file"
+            id="image"
+            name="image"
+            accept="image/png,image/jpeg,image/gif,image/webp"
+          />
+          <div class="file-upload-icon">📷</div>
+          <p><strong>Click to upload</strong> or drag and drop</p>
+          <p class="text-muted" style="font-size:.85rem;">PNG, JPG, GIF, WEBP — max 5 MB</p>
+        </div>
+        <div class="file-upload-preview" id="imagePreview">
+          <img id="previewImg" src="#" alt="Preview" />
+          <p id="previewName" class="text-muted" style="font-size:.85rem; margin-top:.4rem;"></p>
+        </div>
+        <div id="fileError" class="text-danger" style="display:none; margin-top:.4rem; font-size:.875rem;"></div>
+      </div>
+
+      <div style="border-top:1px solid var(--gray-200); padding-top:1.25rem; margin-top:.5rem;">
+        <button type="submit" class="btn btn-primary btn-lg btn-block" id="submitBtn">
+          📤 Submit Complaint
+        </button>
+      </div>
+
+    </form>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  // ── Character counter ──────────────────────────────────────────────
+  const desc      = document.getElementById("description");
+  const descCount = document.getElementById("descCount");
+  if (desc && descCount) {
+    descCount.textContent = desc.value.length;
+    desc.addEventListener("input", function () {
+      descCount.textContent = this.value.length;
+    });
+  }
+
+  // ── Image upload / drag-drop ───────────────────────────────────────
+  const dropZone    = document.getElementById("dropZone");
+  const fileInput   = document.getElementById("image");
+  const preview     = document.getElementById("imagePreview");
+  const previewImg  = document.getElementById("previewImg");
+  const previewName = document.getElementById("previewName");
+  const fileError   = document.getElementById("fileError");
+
+  const MAX_SIZE      = 5 * 1024 * 1024;  // 5 MB
+  const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/gif", "image/webp"];
+
+  if (dropZone) {
+    // Open file dialog on click
+    dropZone.addEventListener("click", function () { fileInput.click(); });
+
+    // Drag visual feedback
+    dropZone.addEventListener("dragover",  function (e) { e.preventDefault(); dropZone.classList.add("dragover"); });
+    dropZone.addEventListener("dragleave", function ()  { dropZone.classList.remove("dragover"); });
+    dropZone.addEventListener("drop",      function (e) {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+  }
+
+  if (fileInput) {
+    fileInput.addEventListener("change", function () {
+      if (this.files.length) handleFile(this.files[0]);
+    });
+  }
+
+  function handleFile(file) {
+    fileError.style.display = "none";
+    fileError.textContent   = "";
+    preview.style.display   = "none";
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      fileError.textContent   = "Invalid file type. Please upload a PNG, JPG, GIF, or WEBP image.";
+      fileError.style.display = "block";
+      fileInput.value         = "";
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      fileError.textContent   = "File is too large. Maximum size is 5 MB.";
+      fileError.style.display = "block";
+      fileInput.value         = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      previewImg.src       = e.target.result;
+      previewName.textContent = file.name + " (" + (file.size / 1024).toFixed(1) + " KB)";
+      preview.style.display  = "block";
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── Client-side form validation ───────────────────────────────────
+  const form = document.getElementById("reportForm");
+  if (form) {
+    form.addEventListener("submit", function (e) {
+      let valid = true;
+
+      // Description
+      const descVal = desc.value.trim();
+      if (descVal.length < 10) {
+        desc.classList.add("is-invalid");
+        valid = false;
+      } else {
+        desc.classList.remove("is-invalid");
+      }
+
+      // Category
+      const cat = document.getElementById("category");
+      if (!cat.value) {
+        cat.classList.add("is-invalid");
+        valid = false;
+      } else {
+        cat.classList.remove("is-invalid");
+      }
+
+      // Location
+      const loc = document.getElementById("location");
+      if (!loc.value.trim()) {
+        loc.classList.add("is-invalid");
+        valid = false;
+      } else {
+        loc.classList.remove("is-invalid");
+      }
+
+      if (!valid) {
+        e.preventDefault();
+        // Scroll to first invalid field
+        const first = form.querySelector(".is-invalid");
+        if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    });
+
+    // Remove invalid class on input
+    form.querySelectorAll(".form-control").forEach(function (el) {
+      el.addEventListener("input", function () { this.classList.remove("is-invalid"); });
+      el.addEventListener("change", function () { this.classList.remove("is-invalid"); });
+    });
+  }
+
+});
+</script>
+{% endblock %}

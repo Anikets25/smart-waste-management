@@ -1,0 +1,91 @@
+{% extends "citizen/base.html" %}
+{% block title %}Green Rewards — Citizen Portal{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="page-header">
+    <h1>🌿 Green Rewards Marketplace</h1>
+    <p class="text-muted">Use your Green Points to redeem eco-friendly rewards.</p>
+  </div>
+
+  <!-- Points wallet -->
+  <div class="gp-banner" style="margin-bottom:2rem;">
+    <div class="gp-icon">🌿</div>
+    <div class="gp-info">
+      <span class="gp-number">{{ citizen.green_points or 0 }}</span>
+      <span class="gp-label">Your Green Points Balance</span>
+    </div>
+    <div>
+      <small class="text-muted" style="color:rgba(255,255,255,.8);">
+        Earn 10 points per resolved complaint
+      </small>
+    </div>
+  </div>
+
+  <!-- Rewards grid -->
+  <h2 style="margin-bottom:1rem;">Available Rewards</h2>
+  {% if rewards %}
+  <div class="rewards-grid">
+    {% for r in rewards %}
+    <div class="reward-card {% if citizen.green_points < r.points_cost or r.stock < 1 %}reward-disabled{% endif %}">
+      <div class="reward-icon">🎁</div>
+      <h3>{{ r.name }}</h3>
+      <p>{{ r.description or '' }}</p>
+      <div class="reward-meta">
+        <span class="reward-cost">🌿 {{ r.points_cost }} points</span>
+        <span class="reward-stock {% if r.stock < 5 %}low-stock{% endif %}">
+          {{ r.stock }} left
+        </span>
+      </div>
+      {% if r.stock > 0 and citizen.green_points >= r.points_cost %}
+      <form method="POST" action="{{ url_for('citizen_redeem', reward_id=r.id) }}"
+            onsubmit="return confirm('Redeem {{ r.name }} for {{ r.points_cost }} points?');">
+        <button type="submit" class="btn btn-citizen btn-sm btn-block" style="margin-top:.75rem;">
+          Redeem Now
+        </button>
+      </form>
+      {% elif r.stock < 1 %}
+        <div class="btn btn-secondary btn-sm btn-block" style="margin-top:.75rem; cursor:not-allowed;">Out of Stock</div>
+      {% else %}
+        <div class="btn btn-secondary btn-sm btn-block" style="margin-top:.75rem; cursor:not-allowed;"
+             title="Need {{ r.points_cost - citizen.green_points }} more points">
+          Need {{ r.points_cost }} points
+        </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-muted">No rewards available at the moment. Check back soon!</p>
+  {% endif %}
+
+  <!-- Redemption history -->
+  {% if history %}
+  <div class="card" style="margin-top:2.5rem;">
+    <h3 style="margin-bottom:1rem;">Redemption History</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Reward</th><th>Points Spent</th><th>Status</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          {% for h in history %}
+          <tr>
+            <td>{{ h.reward_name }}</td>
+            <td>🌿 {{ h.points_spent }}</td>
+            <td>
+              <span class="badge {% if h.status=='Approved' %}badge-resolved{% elif h.status=='Rejected' %}badge-submitted{% else %}badge-review{% endif %}">
+                {{ h.status }}
+              </span>
+            </td>
+            <td class="text-muted" style="font-size:.85rem;">{{ h.created_at|format_dt }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+</section>
+{% endblock %}

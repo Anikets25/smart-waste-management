@@ -1,0 +1,124 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ complaint.complaint_id }} — Admin{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="admin-header">
+    <div><h1>Complaint Detail</h1><p class="text-muted"><code>{{ complaint.complaint_id }}</code></p></div>
+    <a href="{{ url_for('admin_complaints') }}" class="btn btn-outline btn-sm">← All Complaints</a>
+  </div>
+
+  <div class="detail-layout">
+    <div class="detail-main">
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:.5rem;">
+          <h2>Complaint Info</h2>
+          <span class="badge badge-{{ complaint.status|lower|replace(' ','') }}">{{ complaint.status }}</span>
+        </div>
+
+        {% set steps=['Submitted','Under Review','In Progress','Resolved'] %}
+        {% set smap={'Submitted':0,'Under Review':1,'In Progress':2,'Resolved':3} %}
+        {% set cur=smap.get(complaint.status,0) %}
+        <div class="status-timeline" style="margin:1.5rem 0;">
+          {% for step in steps %}
+            {% set i=loop.index0 %}
+            <div class="timeline-step {% if i<cur %}done{% elif i==cur %}active{% endif %}">
+              <div class="step-dot">{% if i<cur %}✓{% else %}{{ loop.index }}{% endif %}</div>
+              <div class="step-label">{{ step }}</div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-item"><span class="detail-label">Complaint ID</span><span class="detail-value"><code>{{ complaint.complaint_id }}</code></span></div>
+          <div class="detail-item"><span class="detail-label">Citizen</span><span class="detail-value">{{ complaint.citizen_name or '(anonymous)' }}</span></div>
+          <div class="detail-item"><span class="detail-label">Category</span><span class="detail-value">{{ complaint.category }}</span></div>
+          <div class="detail-item"><span class="detail-label">Submitted</span><span class="detail-value">{{ complaint.created_at|format_dt }}</span></div>
+          <div class="detail-item"><span class="detail-label">Last Updated</span><span class="detail-value">{{ complaint.updated_at|format_dt }}</span></div>
+          <div class="detail-item"><span class="detail-label">Assigned Staff</span><span class="detail-value">{{ complaint.staff_name or '—' }}</span></div>
+          {% if complaint.green_points_awarded > 0 %}
+          <div class="detail-item"><span class="detail-label">Points Awarded</span><span class="detail-value" style="color:var(--green-main); font-weight:700;">🌿 {{ complaint.green_points_awarded }}</span></div>
+          {% endif %}
+        </div>
+        <div class="detail-description" style="margin-top:1rem;">
+          <span class="detail-label">Location</span><p>{{ complaint.location }}</p>
+        </div>
+        <div class="detail-description">
+          <span class="detail-label">Description</span><p>{{ complaint.description }}</p>
+        </div>
+      </div>
+
+      <!-- Update Status -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h3>Update Status</h3>
+        <form method="POST" action="{{ url_for('admin_update_status', cid=complaint.id) }}" style="margin-top:1rem; display:flex; gap:.75rem; flex-wrap:wrap; align-items:flex-end;">
+          <div class="form-group" style="margin-bottom:0; flex:1 1 200px;">
+            <label for="status_sel">New Status</label>
+            <select id="status_sel" name="status" class="form-control" required>
+              {% for s in ['Submitted','Under Review','In Progress','Resolved'] %}
+                <option value="{{ s }}" {% if complaint.status==s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn-admin">💾 Update</button>
+        </form>
+      </div>
+
+      <!-- Assign Staff -->
+      <div class="card">
+        <h3>Assign to Staff</h3>
+        <form method="POST" action="{{ url_for('admin_assign_staff', cid=complaint.id) }}" style="margin-top:1rem; display:flex; gap:.75rem; flex-wrap:wrap; align-items:flex-end;">
+          <div class="form-group" style="margin-bottom:0; flex:1 1 200px;">
+            <label for="staff_sel">Select Staff Member</label>
+            <select id="staff_sel" name="staff_id" class="form-control">
+              <option value="">— Unassigned —</option>
+              {% for s in staff_list %}
+                <option value="{{ s.id }}" {% if complaint.assigned_staff_id==s.id %}selected{% endif %}>
+                  {{ s.name }} ({{ s.employee_id }}){% if s.zone %} · {{ s.zone }}{% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn-admin">Assign</button>
+        </form>
+      </div>
+
+    </div>
+
+    <div class="detail-sidebar">
+      <div class="card" style="margin-bottom:1rem;">
+        <h3>Complaint Photo</h3>
+        {% if complaint.image_path %}
+          <img src="{{ url_for('static', filename=complaint.image_path) }}" alt="Complaint"
+               class="complaint-image" style="cursor:pointer; margin-top:.75rem;"
+               onclick="openLightbox(this.src)"/>
+          <a href="{{ url_for('static', filename=complaint.image_path) }}" download
+             class="btn btn-outline btn-sm btn-block" style="margin-top:.75rem;">⬇️ Download</a>
+        {% else %}
+          <p class="text-muted" style="margin-top:.75rem;">No photo uploaded.</p>
+        {% endif %}
+      </div>
+      {% if complaint.after_image_path %}
+      <div class="card">
+        <h3>After-Cleaning Photo</h3>
+        <img src="{{ url_for('static', filename=complaint.after_image_path) }}" alt="After cleaning"
+             class="complaint-image" style="cursor:pointer; margin-top:.75rem;"
+             onclick="openLightbox(this.src)"/>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<div id="lightbox" class="lightbox" onclick="closeLightbox()" style="display:none;">
+  <img id="lightboxImg" src="" alt="Full size"/>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function openLightbox(src){ document.getElementById("lightboxImg").src=src; document.getElementById("lightbox").style.display="flex"; document.body.style.overflow="hidden"; }
+function closeLightbox(){ document.getElementById("lightbox").style.display="none"; document.body.style.overflow=""; }
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLightbox();});
+</script>
+{% endblock %}

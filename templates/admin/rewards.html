@@ -1,0 +1,70 @@
+{% extends "admin/base.html" %}
+{% block title %}Rewards — Admin{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="admin-header">
+    <div><h1>🌿 Rewards Management</h1><p class="text-muted">Green Points marketplace and pending redemptions.</p></div>
+  </div>
+
+  <!-- Pending redemptions -->
+  {% if redemptions %}
+  <div class="card" style="margin-bottom:2rem; border-left:4px solid var(--status-review);">
+    <h3 style="margin-bottom:1rem;">⏳ Pending Redemptions ({{ redemptions|length }})</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Citizen</th><th>Reward</th><th>Points</th><th>Requested</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for r in redemptions %}
+          <tr>
+            <td>{{ r.citizen_name }}</td>
+            <td>{{ r.reward_name }}</td>
+            <td>🌿 {{ r.points_spent }}</td>
+            <td class="text-muted" style="font-size:.85rem;">{{ r.created_at|format_dt }}</td>
+            <td style="display:flex; gap:.4rem; flex-wrap:wrap;">
+              <form method="POST" action="{{ url_for('admin_approve_redemption', rid=r.id) }}" style="display:inline;">
+                <button type="submit" class="btn btn-primary btn-sm">✅ Approve</button>
+              </form>
+              <form method="POST" action="{{ url_for('admin_reject_redemption', rid=r.id) }}"
+                    style="display:inline;" onsubmit="return confirm('Reject and refund points?');">
+                <button type="submit" class="btn btn-danger btn-sm">❌ Reject</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="card" style="margin-bottom:2rem; padding:1.25rem; background:var(--green-pale);">
+    <p class="text-muted">No pending redemptions.</p>
+  </div>
+  {% endif %}
+
+  <!-- Rewards catalogue -->
+  <div class="card">
+    <h3 style="margin-bottom:1rem;">Rewards Catalogue</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Name</th><th>Description</th><th>Points Cost</th><th>Stock</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          {% for r in rewards %}
+          <tr>
+            <td><strong>{{ r.name }}</strong></td>
+            <td class="text-muted">{{ r.description or '—' }}</td>
+            <td>🌿 {{ r.points_cost }}</td>
+            <td {% if r.stock < 5 %}style="color:var(--status-review); font-weight:600;"{% endif %}>{{ r.stock }}</td>
+            <td><span class="badge {% if r.is_active %}badge-resolved{% else %}badge-submitted{% endif %}">{% if r.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

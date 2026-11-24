@@ -1,0 +1,107 @@
+{% extends "citizen/base.html" %}
+{% block title %}Dashboard — Citizen Portal{% endblock %}
+
+{% block content %}
+<section class="section">
+
+  <!-- Welcome -->
+  <div class="citizen-welcome">
+    <div>
+      <h1>👋 Hello, {{ session.citizen_name }}!</h1>
+      <p class="text-muted">Here's an overview of your waste reports and green points.</p>
+    </div>
+    <a href="{{ url_for('citizen_report') }}" class="btn btn-citizen btn-lg">🗑️ Report Waste</a>
+  </div>
+
+  <!-- Green Points banner -->
+  <div class="gp-banner">
+    <div class="gp-icon">🌿</div>
+    <div class="gp-info">
+      <span class="gp-number">{{ citizen.green_points or 0 }}</span>
+      <span class="gp-label">Green Points</span>
+    </div>
+    <a href="{{ url_for('citizen_rewards') }}" class="btn btn-outline-white btn-sm">View Rewards →</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-cards" style="margin-top:1.5rem;">
+    <div class="stat-card">
+      <span class="stat-number">{{ stats.total }}</span>
+      <span class="stat-label">Total Reports</span>
+    </div>
+    <div class="stat-card submitted">
+      <span class="stat-number">{{ stats.submitted }}</span>
+      <span class="stat-label">Submitted</span>
+    </div>
+    <div class="stat-card review">
+      <span class="stat-number">{{ stats.under_review }}</span>
+      <span class="stat-label">Under Review</span>
+    </div>
+    <div class="stat-card inprogress">
+      <span class="stat-number">{{ stats.in_progress }}</span>
+      <span class="stat-label">In Progress</span>
+    </div>
+    <div class="stat-card resolved">
+      <span class="stat-number">{{ stats.resolved }}</span>
+      <span class="stat-label">Resolved</span>
+    </div>
+  </div>
+
+  <!-- Recent complaints -->
+  <div class="card" style="margin-top:2rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <h3>Recent Reports</h3>
+      <a href="{{ url_for('citizen_my_complaints') }}" class="btn btn-outline btn-sm">View All →</a>
+    </div>
+    {% if recent %}
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Complaint ID</th><th>Category</th><th>Status</th><th>Date</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for c in recent %}
+          <tr>
+            <td><code>{{ c.complaint_id }}</code></td>
+            <td>{{ c.category }}</td>
+            <td><span class="badge badge-{{ c.status|lower|replace(' ','') }}">{{ c.status }}</span></td>
+            <td class="text-muted" style="font-size:.85rem;">{{ c.created_at|format_dt }}</td>
+            <td><a href="{{ url_for('citizen_complaint_detail', complaint_id_str=c.complaint_id) }}" class="btn btn-outline btn-sm">View</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="text-muted">You haven't submitted any complaints yet.
+      <a href="{{ url_for('citizen_report') }}">Report your first →</a>
+    </p>
+    {% endif %}
+  </div>
+
+  <!-- Quick actions -->
+  <div class="feature-grid" style="margin-top:2rem;">
+    <a href="{{ url_for('citizen_report') }}" class="feature-card" style="text-decoration:none; color:inherit;">
+      <div class="feature-icon">🗑️</div>
+      <h3>Report Waste</h3>
+      <p>Submit a new garbage complaint with photo and location.</p>
+    </a>
+    <a href="{{ url_for('citizen_my_complaints') }}" class="feature-card" style="text-decoration:none; color:inherit;">
+      <div class="feature-icon">📋</div>
+      <h3>My Complaints</h3>
+      <p>Track the status of all your submitted reports.</p>
+    </a>
+    <a href="{{ url_for('citizen_rewards') }}" class="feature-card" style="text-decoration:none; color:inherit;">
+      <div class="feature-icon">🌿</div>
+      <h3>Green Rewards</h3>
+      <p>Spend your Green Points on eco-friendly rewards.</p>
+    </a>
+    <a href="{{ url_for('track') }}" class="feature-card" style="text-decoration:none; color:inherit;">
+      <div class="feature-icon">🔍</div>
+      <h3>Track Any Complaint</h3>
+      <p>Look up any complaint using its complaint ID.</p>
+    </a>
+  </div>
+
+</section>
+{% endblock %}

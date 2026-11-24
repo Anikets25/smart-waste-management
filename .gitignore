@@ -1,0 +1,24 @@
+# ── Python ───────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# ── Environment / secrets ─────────────────────────────
+.env
+
+# ── Uploads (user-submitted images are not committed) ─
+static/uploads/*
+!static/uploads/.gitkeep
+
+# ── macOS ─────────────────────────────────────────────
+.DS_Store
+
+# ── IDE ───────────────────────────────────────────────
+.vscode/
+.idea/

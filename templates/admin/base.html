@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Admin — Smart Waste{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+  <nav class="navbar navbar-admin">
+    <div class="nav-container">
+      <a href="{{ url_for('admin_dashboard') }}" class="nav-brand">
+        <span class="brand-icon">🏛️</span>
+        <span class="brand-text">SmartWaste <span class="portal-tag">Admin</span></span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="{{ url_for('admin_dashboard') }}"  class="nav-link {% if request.endpoint=='admin_dashboard' %}active{% endif %}">📊 Dashboard</a></li>
+        <li><a href="{{ url_for('admin_complaints') }}" class="nav-link {% if request.endpoint in ('admin_complaints','admin_complaint_detail') %}active{% endif %}">📋 Complaints</a></li>
+        <li><a href="{{ url_for('admin_staff_list') }}" class="nav-link {% if 'staff' in request.endpoint %}active{% endif %}">👷 Staff</a></li>
+        <li><a href="{{ url_for('admin_rewards') }}"    class="nav-link {% if request.endpoint=='admin_rewards' %}active{% endif %}">🌿 Rewards</a></li>
+        <li><a href="{{ url_for('admin_logout') }}" class="nav-link nav-link-logout">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for cat, msg in messages %}
+          <div class="flash flash-{{ cat }}">
+            <span>{{ msg }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main class="main-content">{% block content %}{% endblock %}</main>
+
+  <footer class="footer footer-admin">
+    <div class="footer-bottom">
+      <p>© 2024 Smart Waste Management System — Admin Portal</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

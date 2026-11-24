@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Track Complaint — Smart Waste Management System{% endblock %}
+
+{% block content %}
+
+<section class="section">
+  <div class="page-header">
+    <h1>🔍 Track Your Complaint</h1>
+    <p class="text-muted">Enter the complaint ID you received when you submitted your report.</p>
+  </div>
+
+  <!-- Search form -->
+  <div class="form-card" style="max-width:520px;">
+    <form id="trackForm" action="/track" method="GET" novalidate>
+      <div class="form-group">
+        <label for="complaint_id" class="required">Complaint ID</label>
+        <input
+          type="text"
+          id="complaint_id"
+          name="id"
+          class="form-control {% if error %}is-invalid{% endif %}"
+          placeholder="e.g. WMS-20241115-A3F9K2"
+          value="{{ query_id or '' }}"
+          maxlength="30"
+          required
+          autocomplete="off"
+          style="text-transform:uppercase; letter-spacing:.05em;"
+        />
+        {% if error %}
+          <div class="invalid-feedback" style="display:block;">{{ error }}</div>
+        {% else %}
+          <div class="invalid-feedback">Please enter a valid complaint ID.</div>
+        {% endif %}
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Search →</button>
+    </form>
+  </div>
+
+  {% if complaint %}
+  <!-- ── Complaint Result ────────────────────────────────────────────── -->
+  <div class="complaint-result" id="complaintResult">
+    <div class="result-header">
+      <div>
+        <h2>Complaint Details</h2>
+        <p class="complaint-id-display">{{ complaint.complaint_id }}</p>
+      </div>
+      <span class="badge badge-{{ complaint.status | lower | replace(' ', '') }}">
+        {{ complaint.status }}
+      </span>
+    </div>
+
+    <!-- Status Timeline -->
+    {% set steps = ['Submitted', 'Under Review', 'In Progress', 'Resolved'] %}
+    {% set status_order = {'Submitted': 0, 'Under Review': 1, 'In Progress': 2, 'Resolved': 3} %}
+    {% set current_idx  = status_order.get(complaint.status, 0) %}
+
+    <div class="status-timeline">
+      {% for step in steps %}
+        {% set step_idx = loop.index0 %}
+        <div class="timeline-step {% if step_idx < current_idx %}done{% elif step_idx == current_idx %}active{% endif %}">
+          <div class="step-dot">{% if step_idx < current_idx %}✓{% else %}{{ loop.index }}{% endif %}</div>
+          <div class="step-label">{{ step }}</div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Details table -->
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">Category</span>
+        <span class="detail-value">{{ complaint.category }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Location</span>
+        <span class="detail-value">{{ complaint.location }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Submitted On</span>
+        <span class="detail-value">{{ complaint.created_at | format_dt }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Last Updated</span>
+        <span class="detail-value">{{ complaint.updated_at | format_dt }}</span>
+      </div>
+    </div>
+
+    <div class="detail-description">
+      <span class="detail-label">Description</span>
+      <p>{{ complaint.description }}</p>
+    </div>
+
+    {% if complaint.image_path %}
+    <div class="complaint-image-box">
+      <span class="detail-label">Uploaded Photo</span>
+      <img
+        src="{{ url_for('static', filename=complaint.image_path) }}"
+        alt="Complaint photo"
+        class="complaint-image"
+        onclick="openLightbox(this.src)"
+      />
+    </div>
+    {% endif %}
+
+    <div style="margin-top:1.5rem;">
+      <a href="/track" class="btn btn-outline btn-sm">← Search Another</a>
+    </div>
+  </div>
+  {% endif %}
+
+</section>
+
+<!-- Lightbox (simple, no library) -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox()" style="display:none;">
+  <img id="lightboxImg" src="" alt="Full size" />
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Basic form validation
+document.getElementById("trackForm").addEventListener("submit", function (e) {
+  const input = document.getElementById("complaint_id");
+  const val   = input.value.trim().toUpperCase();
+  // Pattern: WMS-YYYYMMDD-XXXXXX  (but be lenient — just check not empty)
+  if (!val) {
+    input.classList.add("is-invalid");
+    e.preventDefault();
+    return;
+  }
+  input.value = val;   // normalise to uppercase before submit
+});
+
+function openLightbox(src) {
+  document.getElementById("lightboxImg").src = src;
+  document.getElementById("lightbox").style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+function closeLightbox() {
+  document.getElementById("lightbox").style.display = "none";
+  document.body.style.overflow = "";
+}
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") closeLightbox();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register — Citizen Portal</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body class="auth-body auth-citizen">
+
+  <div class="auth-wrapper">
+    <div class="auth-brand">
+      <a href="{{ url_for('landing') }}" class="auth-back">← Back to portal home</a>
+      <div class="auth-logo">♻️</div>
+      <h1>Create Account</h1>
+      <p>Join thousands of citizens keeping their area clean.</p>
+    </div>
+
+    <div class="auth-card">
+      <h2>Register</h2>
+      <p class="text-muted" style="margin-bottom:1.5rem;">It's free and takes under a minute.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}
+          <div class="flash flash-{{ cat }}" style="margin-bottom:.75rem;">{{ msg }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('citizen_register') }}" novalidate>
+        <div class="form-group">
+          <label for="name" class="required">Full Name</label>
+          <input type="text" id="name" name="name" class="form-control"
+                 placeholder="Your full name" required maxlength="120"
+                 value="{{ form.name or '' }}"/>
+        </div>
+        <div class="form-group">
+          <label for="email" class="required">Email Address</label>
+          <input type="email" id="email" name="email" class="form-control"
+                 placeholder="you@example.com" required maxlength="180"
+                 value="{{ form.email or '' }}"/>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number <span class="text-muted">(optional)</span></label>
+          <input type="tel" id="phone" name="phone" class="form-control"
+                 placeholder="+91 98765 43210" maxlength="20"
+                 value="{{ form.phone or '' }}"/>
+        </div>
+        <div class="form-group">
+          <label for="password" class="required">Password</label>
+          <div style="position:relative;">
+            <input type="password" id="password" name="password" class="form-control"
+                   placeholder="Minimum 8 characters" required style="padding-right:3rem;"/>
+            <button type="button" class="pwd-toggle" onclick="togglePwd('password')">👁</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="confirm" class="required">Confirm Password</label>
+          <input type="password" id="confirm" name="confirm" class="form-control"
+                 placeholder="Repeat your password" required/>
+        </div>
+        <button type="submit" class="btn btn-citizen btn-block btn-lg" style="margin-top:.5rem;">
+          Create Account →
+        </button>
+      </form>
+
+      <p style="text-align:center; margin-top:1.25rem; font-size:.9rem;">
+        Already have an account?
+        <a href="{{ url_for('citizen_login') }}"><strong>Login →</strong></a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    function togglePwd(id) {
+      const f = document.getElementById(id);
+      f.type  = f.type === "password" ? "text" : "password";
+    }
+  </script>
+</body>
+</html>
