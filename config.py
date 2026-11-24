@@ -43,8 +43,8 @@ class Config:
     SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "False").lower() == "true"
 
     # ── MySQL ──────────────────────────────────────────────────────────────
-    DB_HOST     = os.environ.get("DB_HOST", "localhost")
-    DB_PORT     = int(os.environ.get("DB_PORT", 3306))
-    DB_NAME     = os.environ.get("DB_NAME", "smart_waste_db")
-    DB_USER     = os.environ.get("DB_USER", "root")
+    DB_HOST = os.environ.get("DB_HOST", "localhost")
+    DB_PORT = int(os.environ.get("DB_PORT", 3306))
+    DB_NAME = os.environ.get("DB_NAME", "railway")
+    DB_USER = os.environ.get("DB_USER", "root")
     DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
